@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // A go generate script to inject image strings strings.
@@ -89,6 +90,8 @@ func main() {
 		}
 		lineNumber++
 		if lineNumber == goLine+1 {
+			parts := strings.Split(string(line), " ")
+			fmt.Println(parts)
 			readWriter.WriteString(fmt.Sprintf("const icon = %q\n", imageString))
 		} else {
 			readWriter.Write(line)
