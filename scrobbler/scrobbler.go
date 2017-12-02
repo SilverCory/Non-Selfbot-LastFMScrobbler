@@ -7,7 +7,7 @@ import (
 	"github.com/SilverCory/go_discordrpc"
 )
 
-//go:generate go run ../../assets/generate.go ../../assets/unknown.png
+//go:generate go run ../assets/generate.go ../assets/unknown.png
 const unknown_icon = ``
 
 type Scrobbler struct {
