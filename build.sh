@@ -20,7 +20,7 @@ fi
 
 # git compress and then go generate.
 git gc > /dev/null
-trap "git reset HEAD --hard" INT
+trap "git reset HEAD --hard; exit" INT
 find . -name '*.go' -not -path "*/vendor/*" -not -path "*/pkg/*" -exec go generate {} \;
 echo -e "\\nGo generate complete.\\n\\n"
 
