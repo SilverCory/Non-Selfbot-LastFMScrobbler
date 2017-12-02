@@ -91,8 +91,7 @@ func main() {
 		lineNumber++
 		if lineNumber == goLine+1 {
 			parts := strings.Split(string(line), " ")
-			fmt.Println(parts)
-			readWriter.WriteString(fmt.Sprintf("const icon = %q\n", imageString))
+			readWriter.WriteString(fmt.Sprintf(parts[0]+parts[1]+" = %q\n", imageString))
 		} else {
 			readWriter.Write(line)
 			readWriter.Write([]byte{'\n'})
