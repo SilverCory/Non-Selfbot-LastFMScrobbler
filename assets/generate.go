@@ -25,6 +25,8 @@ import (
 func main() {
 
 	// Check the args for the filename.
+	fmt.Println(filepath.Abs("."))
+
 	fmt.Println(os.Args)
 	if len(os.Args) != 2 {
 		log.Fatal("Usage: generate.go [image.png]")
