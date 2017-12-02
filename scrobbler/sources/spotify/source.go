@@ -7,7 +7,7 @@ import (
 
 const name = "Spotify"
 
-//go:generate go run ../../../assets/generate.go ../../../assets/spotify.png
+//go:generate go run ../../../assets/generate.go ../../../assets/spotify_black.png
 const icon = ``
 
 func init() {
