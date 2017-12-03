@@ -62,7 +62,7 @@ func (sc *Scrobbler) Start() error {
 
 }
 
-func newSong(song *Song, source ScrobbleSource) {
+func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 	// TODO newSong
 }
 
