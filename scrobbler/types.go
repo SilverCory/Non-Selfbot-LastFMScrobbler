@@ -12,7 +12,7 @@ type ScrobbleSource interface {
 	GetSourceName() string
 	Start() error
 	Stop() error
-	GetDefaultConfig() *config.ModuleConfig
+	GetDefaultConfig() config.ModuleConfig
 }
 
 type ImageID string
