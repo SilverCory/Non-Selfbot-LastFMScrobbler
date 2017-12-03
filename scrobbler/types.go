@@ -7,7 +7,7 @@ import (
 
 type ScrobbleSource interface {
 	io.Closer
-	New(instance *Scrobbler, newSong func(song *Song, source *ScrobbleSource), moduleConfig config.ModuleConfig)
+	New(instance *Scrobbler, newSong func(song *Song, source ScrobbleSource), moduleConfig config.ModuleConfig)
 	GetSourceIcon() string
 	GetSourceName() string
 	Start() error

@@ -26,10 +26,10 @@ func init() {
 type Source struct {
 	scrobbler.ScrobbleSource
 	instance *scrobbler.Scrobbler
-	newSong  func(song *scrobbler.Song, source *scrobbler.ScrobbleSource)
+	newSong  func(song *scrobbler.Song, source scrobbler.ScrobbleSource)
 }
 
-func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source *scrobbler.ScrobbleSource), conf config.ModuleConfig) {
+func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source scrobbler.ScrobbleSource), conf config.ModuleConfig) {
 	s.newSong = newSong
 	s.instance = instance
 }
