@@ -19,7 +19,7 @@ type Config struct {
 
 func init() {
 	source := &Source{}
-	scrobbler.RegisterSource(name, &source.ScrobbleSource)
+	scrobbler.RegisterSource(name, source)
 	config.AddDefaultConfig(name, &Config{})
 }
 
@@ -29,7 +29,7 @@ type Source struct {
 	newSong  func(song *scrobbler.Song, source *scrobbler.ScrobbleSource)
 }
 
-func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source *scrobbler.ScrobbleSource)) {
+func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source *scrobbler.ScrobbleSource), conf config.ModuleConfig) {
 	s.newSong = newSong
 	s.instance = instance
 }

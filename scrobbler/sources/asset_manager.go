@@ -62,6 +62,11 @@ func (am *AssetManager) GetAssetViaID(id string) (*DiscordAsset, error) {
 }
 
 func (am *AssetManager) GetAssetViaName(name string) (*DiscordAsset, error) {
+
+	name = strings.Replace(name, " ", "_", -1)
+	name = strings.Replace(name, ".", "", -1)
+	name = strings.ToLower(name)
+
 	assets, err := am.GetAllAssets()
 	if err != nil {
 		return nil, err

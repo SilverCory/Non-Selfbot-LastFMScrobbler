@@ -25,7 +25,7 @@ func New(config *config.Config) (*Scrobbler, error) {
 	for k, v := range config.ModulePriorities {
 		sco, ok := GetScrobbler(k)
 		if ok {
-			ret.sourcesByPriority[*sco] = v
+			ret.sourcesByPriority[sco] = v
 		}
 	}
 
@@ -56,8 +56,10 @@ func (sc *Scrobbler) UploadDefaults() error {
 	}
 
 	for k := range sc.sourcesByPriority {
-		if err := sc.checkDefault(k.GetSourceName(), k.GetSourceIcon(), 1); err != nil {
-			return err
+		if err := sc.checkDefault(
+			k.GetSourceName(),
+			k.GetSourceIcon(), 1); err != nil {
+			fmt.Println(err)
 		}
 	}
 

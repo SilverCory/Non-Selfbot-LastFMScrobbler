@@ -2,6 +2,7 @@ package spotify
 
 import (
 	"errors"
+	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler"
 )
 
@@ -12,7 +13,7 @@ const icon = ``
 
 func init() {
 	source := &Source{}
-	scrobbler.RegisterSource(name, &source.ScrobbleSource)
+	scrobbler.RegisterSource(name, source)
 }
 
 type Source struct {
@@ -21,7 +22,7 @@ type Source struct {
 	newSong  func(song *scrobbler.Song, source *scrobbler.ScrobbleSource)
 }
 
-func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source *scrobbler.ScrobbleSource)) {
+func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source *scrobbler.ScrobbleSource), conf config.ModuleConfig) {
 	s.newSong = newSong
 	s.instance = instance
 }
