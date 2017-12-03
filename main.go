@@ -5,6 +5,7 @@ import (
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler"
 	_ "github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources/lastfm"
 	_ "github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources/spotify"
+	"time"
 )
 
 func main() {
@@ -14,6 +15,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	time.Sleep(5 * time.Second)
 
 	println(sc)
 
