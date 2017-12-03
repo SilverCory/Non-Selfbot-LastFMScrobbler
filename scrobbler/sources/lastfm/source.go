@@ -20,7 +20,7 @@ type Config struct {
 func init() {
 	source := &Source{}
 	scrobbler.RegisterSource(name, source)
-	config.AddDefaultConfig(name, &Config{})
+	config.AddDefaultConfig(name, source.GetDefaultConfig())
 }
 
 type Source struct {
@@ -40,6 +40,13 @@ func (s *Source) GetSourceIcon() string {
 
 func (s *Source) GetSourceName() string {
 	return name
+}
+
+func (s *Source) GetDefaultConfig() config.ModuleConfig {
+	return Config{
+		APIKey:   "API_KEY_HERE",
+		Username: "USERNAMEPLEASE",
+	}
 }
 
 func (s *Source) Start() error {
