@@ -3,11 +3,12 @@ package scrobbler
 import (
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"io"
+	"time"
 )
 
 type ScrobbleSource interface {
 	io.Closer
-	New(instance *Scrobbler, newSong func(song *Song, source ScrobbleSource), moduleConfig config.ModuleConfig)
+	UpdateSource(instance *Scrobbler, newSong func(song *Song, source ScrobbleSource), moduleConfig config.ModuleConfig)
 	GetSourceIcon() string
 	GetSourceName() string
 	Start() error
@@ -21,5 +22,6 @@ type Song struct {
 	Title   string
 	Artist  string
 	Album   string
+	End     time.Time
 	Artwork ImageID
 }
