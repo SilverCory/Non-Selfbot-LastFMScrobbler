@@ -3,16 +3,20 @@ package scrobbler
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
-	"github.com/SilverCory/EzVote/pkg/dep/sources/https---github.com-kataras-iris/core/errors"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources"
 	"github.com/SilverCory/go_discordrpc"
 	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io/ioutil"
 	"mime"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -24,12 +28,14 @@ type Scrobbler struct {
 	sourcesByPriority map[ScrobbleSource]int
 	AssetManager      *sources.AssetManager
 	DiscordRPC        *go_discordrpc.API
+	Config            *config.Config
 }
 
 func New(config *config.Config) (*Scrobbler, error) {
 
 	ret := &Scrobbler{
 		sourcesByPriority: make(map[ScrobbleSource]int),
+		Config:            config,
 	}
 
 	for k, v := range config.ModulePriorities {
@@ -53,27 +59,83 @@ func New(config *config.Config) (*Scrobbler, error) {
 		return nil, err
 	}
 	ret.AssetManager = assetManager
-
-	ret.uploadDefaults()
-
-	for configName, moduleConfig := range config.ModuleConfigs {
-		for module := range ret.sourcesByPriority {
-			if module.GetSourceName() == configName {
-				module.UpdateSource(ret, ret.newSong, moduleConfig)
+	assets, err := ret.AssetManager.GetAllAssets()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		for _, v := range assets {
+			if strings.HasPrefix(v.Name, "cover_") {
+				go ret.AssetManager.RemoveAsset(v.ID)
 			}
 		}
 	}
+
+	for configName, moduleConfig := range config.ModuleConfigs {
+		for module := range ret.sourcesByPriority {
+			fmt.Println(module)
+			if module.GetSourceName() == configName {
+				fmt.Println(module.GetSourceIcon())
+				module.UpdateSource(
+					ret,
+					ret.newSong,
+					moduleConfig)
+			}
+		}
+	}
+
+	ret.uploadDefaults()
 
 	return ret, nil
 }
 
 func (sc *Scrobbler) Start() error {
+
+	fmt.Println("STARTING SCROBBLER")
+	for k := range sc.sourcesByPriority {
+		go func() {
+			if err := k.Start(); err != nil {
+				fmt.Println(err)
+			}
+		}()
+	}
+
 	return nil
+
 }
 
 func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
+
+	if song == nil {
+		fmt.Println("SONG IS NIL!")
+		return
+	}
+
+	assets := &go_discordrpc.Assets{}
+
+	assets.LargeImageID = fmt.Sprint(song.Artwork)
+	assets.LargeText = song.Album
+
+	if asset, err := sc.AssetManager.GetAssetViaName(source.GetSourceName()); err == nil {
+		assets.SmallImageID = asset.Name
+		assets.SmallText = source.GetSourceName()
+	}
+
+	timestamps := &go_discordrpc.TimeStamps{}
+	if song.End.After(time.Now()) {
+		timestamps.EndTimestamp = song.End.Unix()
+	}
+
+	sc.DiscordRPC.SetRichPresence(&go_discordrpc.Activity{
+		TimeStamps: timestamps,
+		State:      song.Title,
+		Details:    song.Artist,
+		Assets:     assets,
+	})
+
+	if sc.nowPlaying != nil {
+		go sc.AssetManager.RemoveAssetViaName(string(sc.nowPlaying.Artwork))
+	}
 	sc.nowPlaying = song
-	// TODO newSong send to discord.
 }
 
 func (sc *Scrobbler) GetNowPlaying() *Song {

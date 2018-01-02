@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler"
+	"github.com/mitchellh/mapstructure"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -18,9 +19,8 @@ const name = "Last FM"
 const icon = ``
 
 type Config struct {
-	config.ModuleConfig
 	Username string `json:"username"`
-	APIKey   string `json:"api_key"`
+	Api_key  string `json:"api_key"`
 }
 
 func init() {
@@ -36,14 +36,24 @@ type Source struct {
 	newSong  func(song *scrobbler.Song, source scrobbler.ScrobbleSource)
 
 	lastString   string
+	lastId       string
+	currentId    string
 	lastDuration time.Duration
 	timeThen     time.Time
 }
 
-func (s *Source) New(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source scrobbler.ScrobbleSource), conf config.ModuleConfig) {
+func (s *Source) UpdateSource(instance *scrobbler.Scrobbler, newSong func(song *scrobbler.Song, source scrobbler.ScrobbleSource), conf config.ModuleConfig) {
 	s.newSong = newSong
 	s.instance = instance
-	s.config = conf.(Config)
+	s.config = Config{}
+	fmt.Println(mapstructure.Decode(conf, &s.config))
+	fmt.Println(s.config)
+	fmt.Println(conf)
+	fmt.Println(s.config.Api_key)
+
+	LASTFMKEY = s.config.Api_key
+	LASTFMUSER = s.config.Username
+
 }
 
 func (s *Source) GetSourceIcon() string {
@@ -56,24 +66,41 @@ func (s *Source) GetSourceName() string {
 
 func (s *Source) GetDefaultConfig() config.ModuleConfig {
 	return Config{
-		APIKey:   "API_KEY_HERE",
+		Api_key:  "API_KEY_HERE",
 		Username: "USERNAMEPLEASE",
 	}
 }
 
+var started = false
+
 func (s *Source) Start() error {
-	return errors.New("NOT IMPLEMENTED") // TODO
+
+	if started {
+		return errors.New("already started")
+	}
+
+	started = true
+	fmt.Println("STARTEWD LASTFM")
+	for {
+
+		time.Sleep(time.Second * 10)
+		s.QueryNewSong()
+
+	}
 }
 
 func (s *Source) Stop() error {
-	return errors.New("NOT IMPLEMENTED") // TODO
+	return errors.New("STOP NOTT IMPLEMENTED") // TODO
 }
 
 func (s *Source) QueryNewSong() error {
 
 	// TODO
 
-	resp, err := http.Get("https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + s.config.Username + "&api_key=" + s.config.APIKey + "&format=json&limit=1")
+	song := &scrobbler.Song{}
+
+	fmt.Println("QUERY NEW SONG")
+	resp, err := http.Get("https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=" + s.config.Username + "&api_key=" + s.config.Api_key + "&format=json&limit=1")
 	if err != nil {
 		return err
 	}
@@ -103,19 +130,26 @@ func (s *Source) QueryNewSong() error {
 	track.LoadDuration()
 	compareString := track.Name + "^^^" + track.Artist.Text
 	if s.lastString != compareString {
-		if s.currentId != bot.Bot.Conf.DiscordDefaultImageID {
-			s.lastId = s.currentId
-		}
-		s.currentId = bot.Bot.Conf.DiscordDefaultImageID
 		if url := track.FindImageURL(); url != "" {
-			s.UploadCover(url)
+			asset, err := s.instance.UploadCoverViaURL(url)
+			if err == nil && asset != nil {
+				song.Artwork = scrobbler.ImageID(asset.Name)
+			} else {
+				song.Artwork = "unknown_art"
+			}
 		} else {
 			fmt.Println("URL was empty!")
 		}
-		s.Assets.RemoveAsset(s.lastId)
-		s.TimeThen = time.Now()
+		s.timeThen = time.Now()
+
+		song.Artist = track.Artist.Text
+		song.Album = track.Album.Text
+		song.Title = track.Name
+		song.End = time.Now().Add(track.Duration - (13 * time.Second))
+		s.newSong(song, s)
 	}
 
 	s.lastString = compareString
+	return nil
 
 }

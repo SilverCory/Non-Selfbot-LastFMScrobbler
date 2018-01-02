@@ -119,6 +119,26 @@ func (am *AssetManager) GetAssetsOfType(Type int) (*[]DiscordAsset, error) {
 
 }
 
+func (am *AssetManager) RemoveAssetViaName(name string) error {
+
+	name = strings.Replace(name, " ", "_", -1)
+	name = strings.Replace(name, ".", "", -1)
+	name = strings.ToLower(name)
+
+	assets, err := am.GetAllAssets()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range assets {
+		if v.Name == name {
+			return am.RemoveAsset(v.ID)
+		}
+	}
+
+	return NotFoundError
+}
+
 func (am *AssetManager) RemoveAsset(id string) error {
 	req, err := am.makeRequest("DELETE", am.getBaseURL()+"/"+id, nil)
 	if err != nil {
