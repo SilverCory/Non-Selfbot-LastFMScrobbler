@@ -6,3 +6,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/lann/mpris2-go"
