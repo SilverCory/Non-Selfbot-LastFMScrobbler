@@ -138,7 +138,7 @@ func (s *Source) QueryNewSong() error {
 				song.Artwork = "unknown_art"
 			}
 		} else {
-			fmt.Println("URL was empty!")
+			song.Artwork = "unknown_art"
 		}
 		s.timeThen = time.Now()
 
