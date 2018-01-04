@@ -127,8 +127,8 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 
 	sc.DiscordRPC.SetRichPresence(&discordrpc.Activity{
 		TimeStamps: timestamps,
-		State:      song.Title,
-		Details:    song.Artist,
+		State:      "🎵 " + song.Title,
+		Details:    "👤 " + song.Artist,
 		Assets:     assets,
 	})
 
