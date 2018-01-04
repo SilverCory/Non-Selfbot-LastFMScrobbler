@@ -1,11 +1,6 @@
 package mpris2
 
 import (
-	"fmt"
-	"time"
-)
-
-import (
 	"errors"
 	"fmt"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"

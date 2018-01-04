@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources"
-	"github.com/SilverCory/go_discordrpc"
+	"github.com/SilverCory/discordrpc-go"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -27,7 +27,7 @@ type Scrobbler struct {
 	nowPlaying        *Song
 	sourcesByPriority map[ScrobbleSource]int
 	AssetManager      *sources.AssetManager
-	DiscordRPC        *go_discordrpc.API
+	DiscordRPC        *discordrpc.API
 	Config            *config.Config
 }
 
@@ -45,7 +45,7 @@ func New(config *config.Config) (*Scrobbler, error) {
 		}
 	}
 
-	api, err := go_discordrpc.New(config.ApplicationID)
+	api, err := discordrpc.New(config.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 		return
 	}
 
-	assets := &go_discordrpc.Assets{}
+	assets := &discordrpc.Assets{}
 
 	assets.LargeImageID = fmt.Sprint(song.Artwork)
 	assets.LargeText = song.Album
@@ -120,12 +120,12 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 		assets.SmallText = source.GetSourceName()
 	}
 
-	timestamps := &go_discordrpc.TimeStamps{}
+	timestamps := &discordrpc.TimeStamps{}
 	if song.End.After(time.Now()) {
 		timestamps.EndTimestamp = song.End.Unix()
 	}
 
-	sc.DiscordRPC.SetRichPresence(&go_discordrpc.Activity{
+	sc.DiscordRPC.SetRichPresence(&discordrpc.Activity{
 		TimeStamps: timestamps,
 		State:      song.Title,
 		Details:    song.Artist,
