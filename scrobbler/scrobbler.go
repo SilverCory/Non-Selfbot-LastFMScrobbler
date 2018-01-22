@@ -135,7 +135,7 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 		Assets:     assets,
 	})
 
-	if sc.nowPlaying != nil {
+	if sc.nowPlaying != nil && sc.nowPlaying.Artwork != "unknown_art" {
 		go sc.AssetManager.RemoveAssetViaName(string(sc.nowPlaying.Artwork))
 	}
 	sc.nowPlaying = song
