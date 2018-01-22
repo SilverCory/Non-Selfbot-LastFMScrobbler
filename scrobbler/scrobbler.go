@@ -113,6 +113,9 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 	assets := &discordrpc.Assets{}
 
 	assets.LargeImageID = fmt.Sprint(song.Artwork)
+	if strings.TrimSpace(assets.LargeImageID) == "" {
+		assets.LargeImageID = "unknown_art"
+	}
 	assets.LargeText = song.Album
 
 	if asset, err := sc.AssetManager.GetAssetViaName(source.GetSourceName()); err == nil {
