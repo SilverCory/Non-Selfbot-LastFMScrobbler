@@ -26,9 +26,9 @@ const unknown_icon = ``
 type Scrobbler struct {
 	nowPlaying        *Song
 	sourcesByPriority map[ScrobbleSource]int
-	AssetManager      *sources.AssetManager
-	DiscordRPC        *discordrpc.API
-	Config            *config.Config
+	//AssetManager      *sources.AssetManager
+	DiscordRPC *discordrpc.API
+	Config     *config.Config
 }
 
 func New(config *config.Config) (*Scrobbler, error) {
@@ -54,21 +54,21 @@ func New(config *config.Config) (*Scrobbler, error) {
 	fmt.Println("Error: ", ret.DiscordRPC.Open())
 	fmt.Println("Open: ", ret.DiscordRPC.IsOpen())
 
-	assetManager, err := sources.NewAssetManager(config.AuthorisationToken, config.ApplicationID)
-	if err != nil {
-		return nil, err
-	}
-	ret.AssetManager = assetManager
-	assets, err := ret.AssetManager.GetAllAssets()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		for _, v := range assets {
-			if strings.HasPrefix(v.Name, "cover_") {
-				go ret.AssetManager.RemoveAsset(v.ID)
-			}
-		}
-	}
+	//assetManager, err := sources.NewAssetManager(config.AuthorisationToken, config.ApplicationID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//ret.AssetManager = assetManager
+	//assets, err := ret.AssetManager.GetAllAssets()
+	//if err != nil {
+	//	fmt.Println(err)
+	//} else {
+	//	for _, v := range assets {
+	//		if strings.HasPrefix(v.Name, "cover_") {
+	//			go ret.AssetManager.RemoveAsset(v.ID)
+	//		}
+	//	}
+	//}
 
 	for configName, moduleConfig := range config.ModuleConfigs {
 		for module := range ret.sourcesByPriority {
@@ -118,10 +118,10 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 	}
 	assets.LargeText = song.Album
 
-	if asset, err := sc.AssetManager.GetAssetViaName(source.GetSourceName()); err == nil {
-		assets.SmallImageID = asset.Name
-		assets.SmallText = source.GetSourceName()
-	}
+	//if asset, err := sc.AssetManager.GetAssetViaName(source.GetSourceName()); err == nil {
+	//	assets.SmallImageID = asset.Name
+	//	assets.SmallText = source.GetSourceName()
+	//}
 
 	timestamps := &discordrpc.TimeStamps{}
 	if song.End.After(time.Now()) {
@@ -136,7 +136,7 @@ func (sc *Scrobbler) newSong(song *Song, source ScrobbleSource) {
 	})
 
 	if sc.nowPlaying != nil && sc.nowPlaying.Artwork != "unknown_art" {
-		go sc.AssetManager.RemoveAssetViaName(string(sc.nowPlaying.Artwork))
+		//go sc.AssetManager.RemoveAssetViaName(string(sc.nowPlaying.Artwork))
 	}
 	sc.nowPlaying = song
 }
@@ -172,7 +172,8 @@ func (sc *Scrobbler) UploadCoverViaURL(url string) (*sources.DiscordAsset, error
 }
 
 func (sc *Scrobbler) UploadCoverImage(image64 string) (*sources.DiscordAsset, error) {
-	return sc.AssetManager.AddAsset("cover_"+strconv.Itoa(int(time.Now().Unix())), image64, 2)
+	return nil, nil
+	//return sc.AssetManager.AddAsset("cover_"+strconv.Itoa(int(time.Now().Unix())), image64, 2)
 }
 
 func (sc *Scrobbler) uploadDefaults() error {
@@ -191,15 +192,15 @@ func (sc *Scrobbler) uploadDefaults() error {
 }
 
 func (sc *Scrobbler) checkDefault(name, source string, Type int) error {
-	asset, err := sc.AssetManager.GetAssetViaName(name)
-	if asset == nil || err == sources.NotFoundError {
-		_, err := sc.AssetManager.AddAsset(name, source, Type)
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-	} else {
-		return err
-	}
-	return nil
+	//asset, err := sc.AssetManager.GetAssetViaName(name)
+	//if asset == nil || err == sources.NotFoundError {
+	//	_, err := sc.AssetManager.AddAsset(name, source, Type)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		return err
+	//	}
+	//} else {
+	//	return err
+	//}
+	//return nil
 }
