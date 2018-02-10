@@ -5,7 +5,6 @@ import (
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/config"
 	"github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler"
 	_ "github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources/lastfm"
-	_ "github.com/SilverCory/Non-Selfbot-LastFMScrobbler/scrobbler/sources/spotify"
 	"os"
 	"os/signal"
 	"syscall"
